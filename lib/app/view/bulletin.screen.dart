@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:kkr_intermediate_2025/app/service/api.service.dart';
+import 'package:kkr_intermediate_2025/app/view/addbulletin.screen.dart';
 
 class BulletinScreen extends StatefulWidget {
   const BulletinScreen({super.key});
@@ -42,7 +43,16 @@ class _BulletinScreenState extends State<BulletinScreen> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('Bulletin KKR'),
-      ) ,
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: (){
+          Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => AddBulletin())
+          );
+        }
+      ),
       body: ListView.builder(
         padding: EdgeInsets.all(8),
         itemCount: data.length,

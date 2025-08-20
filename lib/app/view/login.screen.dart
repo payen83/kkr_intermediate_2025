@@ -26,20 +26,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       var res = await api.postDio('/login', formData);
-      log('res==>');
       
       if(res != null && res.statusCode == 200){
-        
         final data = res.data;
         final bool status = data['status'];
-        // log(status.toString());
         if(status == true && data['data'] != null){
-                  // log("asdsa");
           await UserSharedPreferences.setLocalStorage('token', jsonEncode(data['token']));
+          
           if(!mounted) return;
           Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => BulletinScreen())
           );
+          
         } else {
           log("Invalid password");
         }
