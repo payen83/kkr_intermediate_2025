@@ -21,6 +21,10 @@ class _BulletinScreenState extends State<BulletinScreen> {
     getBulletins();
   }
 
+  void refresh(){
+    getBulletins();
+  }
+
   void getBulletins() async {
     try {
       var result = await api.getDio('/news');
@@ -50,7 +54,11 @@ class _BulletinScreenState extends State<BulletinScreen> {
           Navigator.push(
             context, 
             MaterialPageRoute(builder: (context) => AddBulletin())
-          );
+          ).then((isRefresh){
+            if(isRefresh){
+              refresh();
+            }
+          });
         }
       ),
       body: ListView.builder(
@@ -76,9 +84,14 @@ class BuildBulletinItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var path = 'http://10.0.2.2:8888/api';
     String title = item['title'].toString();
     String date = item['date'].toString();
-    String image = item['image_url'].toString();
+    String image = (item['image_url']).toString();
+    
+    if(image.split('/')[0] != 'https:'){
+      image = path+image;
+    }
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: 4.0),
@@ -116,16 +129,19 @@ class BuildBulletinItem extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  image,
-                  fit: BoxFit.cover,
-                  // errorBuilder: (context, error, stackTrace){
-                  //   return Container(
-                  //     color: Colors.blueGrey,
-                  //     child: Icon(Icons.image_not_supported, size: 40),
-                  //   );
-                  // },
-                ),
+                child: Image.network(image, fit: BoxFit.cover),
+                // image.isNotEmpty 
+                //  ?Image.network(
+                //   image,
+                //   fit: BoxFit.cover,
+                //   // errorBuilder: (context, error, stackTrace){
+                //   //   return Container(
+                //   //     color: Colors.blueGrey,
+                //   //     child: Icon(Icons.image_not_supported, size: 40),
+                //   //   );
+                //   // },
+                // )
+                // : Image.asset('assets/images/shapes.png', fit: BoxFit.cover,),
               ),
             ),
             SizedBox(width: 12,),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserSharedPreferences {
@@ -13,6 +15,7 @@ class UserSharedPreferences {
 
   static Future<String> getLocalStorage(String key) async{
     String? data = prefs?.getString(key);
+    log(data??'empty');
     return data ?? '';
   }
 
