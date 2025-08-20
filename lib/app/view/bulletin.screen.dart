@@ -1,6 +1,8 @@
-import 'dart:math';
+import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:kkr_intermediate_2025/app/service/api.service.dart';
 
 class BulletinScreen extends StatefulWidget {
   const BulletinScreen({super.key});
@@ -10,6 +12,22 @@ class BulletinScreen extends StatefulWidget {
 }
 
 class _BulletinScreenState extends State<BulletinScreen> {
+
+  @override
+  void initState(){
+    super.initState();
+    getBulletins();
+  }
+
+  void getBulletins() async {
+    try {
+      var result = await api.getDio('/news');
+      log(jsonEncode(result));
+    } catch (e){
+      log(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
