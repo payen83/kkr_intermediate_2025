@@ -1,4 +1,11 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:kkr_intermediate_2025/app/service/api.service.dart';
+import 'package:kkr_intermediate_2025/app/service/sharedpreference.service.dart';
+import 'package:kkr_intermediate_2025/app/view/bulletin.screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,6 +17,37 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  void onLogin() async{
+    FormData formData = FormData.fromMap({
+      "email": emailController.text,
+      "password": passwordController.text
+    });
+
+    try {
+      var res = await api.postDio('/login', formData);
+      log('res==>');
+      
+      if(res != null && res.statusCode == 200){
+        
+        final data = res.data;
+        final bool status = data['status'];
+        // log(status.toString());
+        if(status == true && data['data'] != null){
+                  // log("asdsa");
+          await UserSharedPreferences.setLocalStorage('token', jsonEncode(data['token']));
+          if(!mounted) return;
+          Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => BulletinScreen())
+          );
+        } else {
+          log("Invalid password");
+        }
+      } 
+    } catch(e){
+        log(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         // ),
                         // Email Label
                           Container(
-                            margin: EdgeInsets.symmetric(horizontal: 16),
+                            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 15),
                             width: MediaQuery.of(context).size.width,
                             child: Text(
                               "Alamat e-mel",
@@ -97,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: TextField(
                                 controller: emailController,
                                 keyboardType: TextInputType.emailAddress,
-                                textAlign: TextAlign.center,
+                                textAlign: TextAlign.left,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: 'Emel Anda',
@@ -138,12 +176,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             child: Padding(
-                              padding: EdgeInsets.only(left: 48),
+                              padding: EdgeInsets.only(left: 16),
                               child: TextField(
                                 controller: passwordController,
                                 obscureText: true,
                                 keyboardType: TextInputType.visiblePassword,
-                                textAlign: TextAlign.center,
+                                textAlign: TextAlign.left,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintText: 'Kata laluan',
@@ -171,7 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 textStyle: TextStyle(fontSize: 20),
                               ),
-                              onPressed: (){},
+                              onPressed: onLogin,
                               child: Text('Log masuk'),
                             ),
                           ),

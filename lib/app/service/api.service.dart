@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:kkr_intermediate_2025/app/service/sharedpreference.service.dart';
@@ -14,6 +13,7 @@ class ApiServices {
     String token = await UserSharedPreferences.getLocalStorage('token');
     String fullURL = baseURL + path;
 
+    log(formdata.toString());
     var headers = {
       'accept': 'application/json'
     };
@@ -23,7 +23,7 @@ class ApiServices {
     }
     var response = await Dio().post(
       fullURL, data: formdata, options: Options(headers: headers));
-      
+
     return response;
   }
 
