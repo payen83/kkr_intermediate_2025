@@ -20,8 +20,8 @@ class ApiServices {
       );
 
       if(response.statusCode == 200){
-        log('success!!');
-        log(jsonEncode(response.data));
+        // log('success!!');
+        // log(jsonEncode(response.data));
         return response.data;
       } else {
         log('Request failed. Status code ${response.statusCode}');
