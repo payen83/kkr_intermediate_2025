@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class AddBulletin extends StatefulWidget {
@@ -16,11 +18,14 @@ class _AddBulletinState extends State<AddBulletin> {
   String imagePath = '';
   String title = '';
   int lines = 1;
-  
-  Future<void> selectDate() async{
+
+  Future<void> selectDate() async {
     DateTime? picked = await showDatePicker(
-      context: context, firstDate: DateTime.now(), lastDate: DateTime(2100));
-    if(picked != null){
+      context: context,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
       setState(() {
         dateController.text = picked.toString().split(" ")[0];
       });
@@ -39,27 +44,64 @@ class _AddBulletinState extends State<AddBulletin> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            TextfieldWidget(fieldController: titleController, lines: 1, textLabel: 'Title'),
-            TextfieldWidget(fieldController: descriptionController, lines: 5, textLabel: 'Description'),
-            TextfieldWidget(fieldController: locationController, lines: 1, textLabel: ':Location'),
+            TextfieldWidget(
+              fieldController: titleController,
+              lines: 1,
+              textLabel: 'Title',
+            ),
+            TextfieldWidget(
+              fieldController: descriptionController,
+              lines: 5,
+              textLabel: 'Description',
+            ),
+            TextfieldWidget(
+              fieldController: locationController,
+              lines: 1,
+              textLabel: ':Location',
+            ),
             Padding(
               padding: EdgeInsets.only(top: 20),
               child: TextField(
                 controller: dateController,
                 maxLines: 1,
                 decoration: InputDecoration(
-                  border:OutlineInputBorder(),
+                  border: OutlineInputBorder(),
                   labelText: 'Date',
-                  suffixIcon: Icon(Icons.calendar_today)
+                  suffixIcon: Icon(Icons.calendar_today),
                 ),
                 readOnly: true,
                 onTap: () => selectDate(),
               ),
+            ),
+            //Image picker
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: InkWell(
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.green, width: 1),
+                    image: imagePath == ''
+                        ? null
+                        : DecorationImage(image: FileImage(File(imagePath))),
+                  ),
+                  child: imagePath == ''
+                      ? Icon(Icons.add_a_photo, color: Colors.black, size: 32)
+                      : null,
+                ),
+                onTap: () async {},
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: ElevatedButton(onPressed: (){}, child: Text('Submit', style: TextStyle(fontSize: 20),)),
             )
             // TextfieldWidget(fieldController: dateController, lines: 1, textLabel: 'Date'),
           ],
         ),
-      )
+      ),
     );
   }
 }
@@ -84,7 +126,7 @@ class TextfieldWidget extends StatelessWidget {
         controller: fieldController,
         maxLines: lines,
         decoration: InputDecoration(
-          border:OutlineInputBorder(),
+          border: OutlineInputBorder(),
           labelText: textLabel,
         ),
       ),
