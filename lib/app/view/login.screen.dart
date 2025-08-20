@@ -1,0 +1,190 @@
+import 'package:flutter/material.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 201, 161, 161),
+              shape: BoxShape.rectangle
+            ),
+          ),
+          // Container(
+          //   width: MediaQuery.of(context).size.width,
+          //   height: MediaQuery.of(context).size.height * 0.3,
+          //   decoration: BoxDecoration(
+          //     color: Colors.white, 
+          //     borderRadius: BorderRadius.only(
+          //       bottomLeft: Radius.circular(50),
+          //       bottomRight: Radius.circular(50)
+          //     )
+          //   ),
+          // ),
+          Center(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: 30),
+                    width: MediaQuery.of(context).size.width,
+                    child: Text("My Jalan KKR",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 40,
+                      fontWeight: FontWeight.w600
+                    ),),
+                  ),
+
+                  Card(
+                    margin: EdgeInsets.all(32),
+                    color: Colors.white,
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      children: [
+                        // Container(
+                        //   margin: EdgeInsets.symmetric(horizontal: 16),
+                        //   width: MediaQuery.of(context).size.width,
+                        //   child: Text('Email', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),),
+                        // ),
+                        // Email Label
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 16),
+                            width: MediaQuery.of(context).size.width,
+                            child: Text(
+                              "Alamat e-mel",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+
+                          // Email Text Field
+                          Card(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
+                            color: Colors.white,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: BorderSide(
+                                color: Colors.grey,
+                                width: 1,
+                              ),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: TextField(
+                                controller: emailController,
+                                keyboardType: TextInputType.emailAddress,
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Emel Anda',
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          // Password Label
+                          Container(
+                            margin: EdgeInsets.fromLTRB(16, 10, 16, 0),
+                            width: MediaQuery.of(context).size.width,
+                            child: Text(
+                              "Kata laluan",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+
+                          // Password Text Field
+                          Card(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
+                            color: Colors.white,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: BorderSide(
+                                color: Colors.grey,
+                                width: 1,
+                              ),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 48),
+                              child: TextField(
+                                controller: passwordController,
+                                obscureText: true,
+                                keyboardType: TextInputType.visiblePassword,
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: 'Kata laluan',
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 16,
+                                  ),
+                                  // Eye Icon
+                                  
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 30),
+                            width: MediaQuery.of(context).size.width,
+                            height: 50,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blueGrey,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                textStyle: TextStyle(fontSize: 20),
+                              ),
+                              onPressed: (){},
+                              child: Text('Log masuk'),
+                            ),
+                          ),
+
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
