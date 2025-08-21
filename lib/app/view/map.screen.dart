@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:kkr_intermediate_2025/app/widget/drawer.widget.dart';
 import 'package:latlong2/latlong.dart';
@@ -15,16 +16,42 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> with
 TickerProviderStateMixin {
-
+  final PopupController popupLayerController = PopupController();
   late final AnimatedMapController animatedMapController;
   double lat = 0.0;
   double lng = 0.0;
-  var currentLatLng = LatLng(3.1467845, 101.6882443);
+  LatLng currentLatLng = LatLng(3.1467845, 101.6882443);
+
+  bool isMarkerCenter = true;
+  List<Marker> markers = [];
+  LatLng? centerMarker;
+  // LatLng? pinLocation;
 
   @override
   void initState(){
     super.initState();
     animatedMapController = AnimatedMapController(vsync: this);
+    getLatLng();
+  }
+
+  void setMarker(LatLng markerPoint){
+    markers.clear();
+    popupLayerController.hideAllPopups();
+    markers.add(Marker(
+      point: markerPoint, 
+      width: 40,
+      height: 40,
+      child: Icon(Icons.location_pin, color: Colors.red, size: 40,),
+    )
+    );
+
+    animatedMapController.animateTo(
+      dest: markerPoint,
+      zoom: 13,
+      curve: Curves.easeInOut,
+      duration: Duration(milliseconds: 1000)
+    );
+    log('marker moved');
   }
 
   Future<void> getLatLng() async {
@@ -49,6 +76,8 @@ TickerProviderStateMixin {
       setState(() {
         lat = position.latitude;
         lng = position.longitude;
+        currentLatLng = LatLng(lat, lng);
+        setMarker(currentLatLng);
       });
     } catch(e){
       log('Error in getting current location');
@@ -60,7 +89,7 @@ TickerProviderStateMixin {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text('Map and Geolocation'),
+        title: Text('Map and Geolocation2'),
       ),
       // body: GeolcationScreen(lat: lat, lng: lng),
       body: Stack(
@@ -69,9 +98,10 @@ TickerProviderStateMixin {
             mapController: animatedMapController.mapController,
             options: MapOptions(
               initialCenter: currentLatLng,
-              initialZoom: 13,
+              initialZoom: 16,
               interactionOptions: InteractionOptions(
-                flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag
+                flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
+
               ),
               onPositionChanged: (position, hasGesture){},
               onTap: (tapPosition, point){},
@@ -80,7 +110,14 @@ TickerProviderStateMixin {
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.kkr_intermediate_2025',
-              )
+              ),
+              if(isMarkerCenter)...[
+                //Add Marker pin
+                Align(
+                  alignment: Alignment.center,
+                  child: Icon(Icons.location_pin, color: Colors.red, size: 40,),
+                ),
+              ]
             ]
           )
         ],
