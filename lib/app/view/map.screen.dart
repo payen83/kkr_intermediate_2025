@@ -14,8 +14,7 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> with
-TickerProviderStateMixin {
+class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   final PopupController popupLayerController = PopupController();
   late final AnimatedMapController animatedMapController;
   double lat = 0.0;
@@ -25,47 +24,49 @@ TickerProviderStateMixin {
   bool isMarkerCenter = true;
   List<Marker> markers = [];
   LatLng? centerMarker;
-  // LatLng? pinLocation;
+  TextEditingController searchController = TextEditingController();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     animatedMapController = AnimatedMapController(vsync: this);
     getLatLng();
   }
 
-  void setMarker(LatLng markerPoint){
+  void setMarker(LatLng markerPoint) {
     setState(() {
       isMarkerCenter = true;
     });
     markers.clear();
-    markers.add(Marker(
-      point: markerPoint, 
-      width: 40,
-      height: 40,
-      child: Icon(Icons.location_pin, color: Colors.red, size: 40,),
-    )
+    markers.add(
+      Marker(
+        point: markerPoint,
+        width: 40,
+        height: 40,
+        child: Icon(Icons.location_pin, color: Colors.red, size: 40),
+      ),
     );
     animatedMapController.animateTo(
       dest: markerPoint,
       zoom: 13,
       curve: Curves.easeInOut,
-      duration: Duration(milliseconds: 1000)
+      duration: Duration(milliseconds: 1000),
     );
   }
 
   Future<void> getLatLng() async {
     LocationPermission permission;
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    
-    if(!serviceEnabled){
+
+    if (!serviceEnabled) {
       return Future.error('Location services are disabled');
     }
 
     permission = await Geolocator.checkPermission();
-    if(permission == LocationPermission.denied || permission == LocationPermission.deniedForever){
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
       permission = await Geolocator.requestPermission();
-      if(permission == LocationPermission.denied){
+      if (permission == LocationPermission.denied) {
         return Future.error('Location please enable your location');
       }
     }
@@ -79,7 +80,7 @@ TickerProviderStateMixin {
         centerMarker = currentLatLng;
         setMarker(currentLatLng);
       });
-    } catch(e){
+    } catch (e) {
       log('Error in getting current location');
     }
   }
@@ -101,13 +102,12 @@ TickerProviderStateMixin {
               initialZoom: 16,
               interactionOptions: InteractionOptions(
                 flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
-
               ),
-              onPositionChanged: (position, hasGesture){
+              onPositionChanged: (position, hasGesture) {
                 final previousCenter = centerMarker;
                 final newCenter = position.center;
                 setState(() {
-                  if(hasGesture && newCenter != previousCenter){
+                  if (hasGesture && newCenter != previousCenter) {
                     centerMarker = newCenter;
                     isMarkerCenter = true;
                     markers.clear();
@@ -115,7 +115,7 @@ TickerProviderStateMixin {
                   }
                 });
               },
-              onTap: (tapPosition, point){
+              onTap: (tapPosition, point) {
                 setState(() {
                   popupLayerController.hideAllPopups();
                   markers.clear();
@@ -136,42 +136,83 @@ TickerProviderStateMixin {
                   popupController: popupLayerController,
                   markerTapBehavior: MarkerTapBehavior.togglePopup(),
                   popupDisplayOptions: PopupDisplayOptions(
-                    builder: (BuildContext context, Marker marker){
+                    builder: (BuildContext context, Marker marker) {
                       return PopupCard(pointMarker: centerMarker);
-                    }
+                    },
                   ),
                   onPopupEvent: (event, selectedMarkers) {
                     markers.clear();
-                    if(selectedMarkers.isNotEmpty){
+                    if (selectedMarkers.isNotEmpty) {
                       final marker = selectedMarkers.first;
                       animatedMapController.animateTo(
                         dest: marker.point,
                         zoom: 13,
                         curve: Curves.easeInOut,
-                        duration: Duration(milliseconds: 1000)
+                        duration: Duration(milliseconds: 1000),
                       );
                     }
-                  }
+                  },
                 ),
-                
               ),
-              if(isMarkerCenter)...[
+              if (isMarkerCenter) ...[
                 //Add marker info
                 Align(
                   alignment: Alignment.center,
                   child: Transform.translate(
-                      offset: Offset(0, -80),
-                      child: PopupCard(pointMarker: centerMarker),
-                    ),
+                    offset: Offset(0, -80),
+                    child: PopupCard(pointMarker: centerMarker),
+                  ),
                 ),
                 //Add Marker pin
                 Align(
                   alignment: Alignment.center,
-                  child: Icon(Icons.location_pin, color: Colors.red, size: 40,),
+                  child: Icon(Icons.location_pin, color: Colors.red, size: 40),
                 ),
-              ]
-            ]
-          )
+              ],
+              //Menu Anchor for search and result location
+              Padding(
+                padding: EdgeInsetsGeometry.fromLTRB(16, 4, 16, 16),
+                child: MenuAnchor(
+                  style: MenuStyle(
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                    backgroundColor: WidgetStateProperty.all(Colors.white),
+                    shape: WidgetStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  menuChildren: [],
+                  builder: (_, MenuController menuController, Widget? child){
+                    return Card(
+                      margin: EdgeInsets.only(top: 10),
+                      color: Colors.white,
+                      child: TextFormField(
+                        controller: searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search location..',
+                          prefixIcon: Icon(Icons.search),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          suffixIcon: IconButton(
+                            onPressed: (){},
+                            icon: Icon(
+                              Icons.close_rounded, 
+                              color: searchController.text.isNotEmpty 
+                              ? Colors.black
+                              :Colors.transparent
+                            )
+                          )
+                        ),
+                        onChanged: (value) => {},
+                      ),
+
+                    );
+                  }
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       drawer: DrawerWidget(),
@@ -180,10 +221,7 @@ TickerProviderStateMixin {
 }
 
 class PopupCard extends StatelessWidget {
-  const PopupCard({
-    super.key,
-    required this.pointMarker,
-  });
+  const PopupCard({super.key, required this.pointMarker});
 
   final LatLng? pointMarker;
 
@@ -191,22 +229,20 @@ class PopupCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8)
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Padding(
         padding: EdgeInsets.all(12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Lat: ${ pointMarker?.latitude.toStringAsFixed(5) ?? 'Loading..' }',
+              'Lat: ${pointMarker?.latitude.toStringAsFixed(5) ?? 'Loading..'}',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
             Text(
-              'Lng: ${ pointMarker?.longitude.toStringAsFixed(5) ?? 'Loading'}',
+              'Lng: ${pointMarker?.longitude.toStringAsFixed(5) ?? 'Loading'}',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-            )
+            ),
           ],
         ),
       ),
@@ -215,11 +251,7 @@ class PopupCard extends StatelessWidget {
 }
 
 class GeolcationScreen extends StatelessWidget {
-  const GeolcationScreen({
-    super.key,
-    required this.lat,
-    required this.lng,
-  });
+  const GeolcationScreen({super.key, required this.lat, required this.lng});
 
   final double lat;
   final double lng;
@@ -230,14 +262,14 @@ class GeolcationScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Latitude: $lat', style: TextStyle(fontSize: 20),),
-          SizedBox(height: 10,),
+          Text('Latitude: $lat', style: TextStyle(fontSize: 20)),
+          SizedBox(height: 10),
           Text('Longitude: $lng', style: TextStyle(fontSize: 20)),
-          SizedBox(height: 20,),
+          SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () => (){}, 
-            child: Text('Get Geolocation')
-          )
+            onPressed: () => () {},
+            child: Text('Get Geolocation'),
+          ),
         ],
       ),
     );
