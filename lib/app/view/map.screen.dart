@@ -1,8 +1,10 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:kkr_intermediate_2025/app/widget/drawer.widget.dart';
+import 'package:latlong2/latlong.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -11,10 +13,19 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen> with
+TickerProviderStateMixin {
 
+  late final AnimatedMapController animatedMapController;
   double lat = 0.0;
   double lng = 0.0;
+  var currentLatLng = LatLng(3.1467845, 101.6882443);
+
+  @override
+  void initState(){
+    super.initState();
+    animatedMapController = AnimatedMapController(vsync: this);
+  }
 
   Future<void> getLatLng() async {
     LocationPermission permission;
@@ -51,22 +62,60 @@ class _MapScreenState extends State<MapScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('Map and Geolocation'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Latitude: $lat', style: TextStyle(fontSize: 20),),
-            SizedBox(height: 10,),
-            Text('Longitude: $lng', style: TextStyle(fontSize: 20)),
-            SizedBox(height: 20,),
-            ElevatedButton(
-              onPressed: () => getLatLng(), 
-              child: Text('Get Geolocation')
-            )
-          ],
-        ),
+      // body: GeolcationScreen(lat: lat, lng: lng),
+      body: Stack(
+        children: [
+          FlutterMap(
+            mapController: animatedMapController.mapController,
+            options: MapOptions(
+              initialCenter: currentLatLng,
+              initialZoom: 13,
+              interactionOptions: InteractionOptions(
+                flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag
+              ),
+              onPositionChanged: (position, hasGesture){},
+              onTap: (tapPosition, point){},
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.example.kkr_intermediate_2025',
+              )
+            ]
+          )
+        ],
       ),
       drawer: DrawerWidget(),
+    );
+  }
+}
+
+class GeolcationScreen extends StatelessWidget {
+  const GeolcationScreen({
+    super.key,
+    required this.lat,
+    required this.lng,
+  });
+
+  final double lat;
+  final double lng;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Latitude: $lat', style: TextStyle(fontSize: 20),),
+          SizedBox(height: 10,),
+          Text('Longitude: $lng', style: TextStyle(fontSize: 20)),
+          SizedBox(height: 20,),
+          ElevatedButton(
+            onPressed: () => (){}, 
+            child: Text('Get Geolocation')
+          )
+        ],
+      ),
     );
   }
 }
