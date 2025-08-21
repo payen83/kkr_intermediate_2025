@@ -35,8 +35,10 @@ TickerProviderStateMixin {
   }
 
   void setMarker(LatLng markerPoint){
+    setState(() {
+      isMarkerCenter = true;
+    });
     markers.clear();
-    popupLayerController.hideAllPopups();
     markers.add(Marker(
       point: markerPoint, 
       width: 40,
@@ -44,14 +46,12 @@ TickerProviderStateMixin {
       child: Icon(Icons.location_pin, color: Colors.red, size: 40,),
     )
     );
-
     animatedMapController.animateTo(
       dest: markerPoint,
       zoom: 13,
       curve: Curves.easeInOut,
       duration: Duration(milliseconds: 1000)
     );
-    log('marker moved');
   }
 
   Future<void> getLatLng() async {
@@ -72,14 +72,12 @@ TickerProviderStateMixin {
 
     try {
       Position position = await Geolocator.getCurrentPosition();
-      log(position.toString());
       setState(() {
         lat = position.latitude;
         lng = position.longitude;
         currentLatLng = LatLng(lat, lng);
         centerMarker = currentLatLng;
         setMarker(currentLatLng);
-
       });
     } catch(e){
       log('Error in getting current location');
@@ -105,13 +103,57 @@ TickerProviderStateMixin {
                 flags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
 
               ),
-              onPositionChanged: (position, hasGesture){},
-              onTap: (tapPosition, point){},
+              onPositionChanged: (position, hasGesture){
+                final previousCenter = centerMarker;
+                final newCenter = position.center;
+                setState(() {
+                  if(hasGesture && newCenter != previousCenter){
+                    centerMarker = newCenter;
+                    isMarkerCenter = true;
+                    markers.clear();
+                    popupLayerController.hideAllPopups();
+                  }
+                });
+              },
+              onTap: (tapPosition, point){
+                setState(() {
+                  popupLayerController.hideAllPopups();
+                  markers.clear();
+                  isMarkerCenter = false;
+                  centerMarker = point;
+                  setMarker(point);
+                });
+              },
             ),
             children: [
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.kkr_intermediate_2025',
+              ),
+              PopupMarkerLayer(
+                options: PopupMarkerLayerOptions(
+                  markers: markers,
+                  popupController: popupLayerController,
+                  markerTapBehavior: MarkerTapBehavior.togglePopup(),
+                  popupDisplayOptions: PopupDisplayOptions(
+                    builder: (BuildContext context, Marker marker){
+                      return PopupCard(pointMarker: centerMarker);
+                    }
+                  ),
+                  onPopupEvent: (event, selectedMarkers) {
+                    markers.clear();
+                    if(selectedMarkers.isNotEmpty){
+                      final marker = selectedMarkers.first;
+                      animatedMapController.animateTo(
+                        dest: marker.point,
+                        zoom: 13,
+                        curve: Curves.easeInOut,
+                        duration: Duration(milliseconds: 1000)
+                      );
+                    }
+                  }
+                ),
+                
               ),
               if(isMarkerCenter)...[
                 //Add marker info
@@ -119,28 +161,7 @@ TickerProviderStateMixin {
                   alignment: Alignment.center,
                   child: Transform.translate(
                       offset: Offset(0, -80),
-                      child: Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(12),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Lat: ${ centerMarker?.latitude.toStringAsFixed(5) }',
-                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                              ),
-                              Text(
-                                'Lng: ${ centerMarker?.longitude.toStringAsFixed(5) }',
-                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
+                      child: PopupCard(pointMarker: centerMarker),
                     ),
                 ),
                 //Add Marker pin
@@ -154,6 +175,41 @@ TickerProviderStateMixin {
         ],
       ),
       drawer: DrawerWidget(),
+    );
+  }
+}
+
+class PopupCard extends StatelessWidget {
+  const PopupCard({
+    super.key,
+    required this.pointMarker,
+  });
+
+  final LatLng? pointMarker;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8)
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Lat: ${ pointMarker?.latitude.toStringAsFixed(5) ?? 'Loading..' }',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              'Lng: ${ pointMarker?.longitude.toStringAsFixed(5) ?? 'Loading'}',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
