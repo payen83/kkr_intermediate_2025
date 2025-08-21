@@ -18,14 +18,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
 
   void onLogin() async {
-    // FormData formData = FormData.fromMap({
-    //   "email": emailController.text,
-    //   "password": passwordController.text
-    // });
     FormData formData = FormData.fromMap({
-      "email": 'test1@email.com',
-      "password": 'test1234',
+      "email": emailController.text,
+      "password": passwordController.text
     });
+    // FormData formData = FormData.fromMap({
+    //   "email": 'test1@email.com',
+    //   "password": 'test1234',
+    // });
     try {
       var res = await api.postDio('/login', formData);
 

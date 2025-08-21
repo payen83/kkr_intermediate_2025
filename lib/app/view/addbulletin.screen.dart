@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -54,21 +53,17 @@ class _AddBulletinState extends State<AddBulletin> {
         "description": descriptionController.text,
         "image_path": ''
       };
+
       if(path != null){
         data['image_url'] = path;
-        
       }
 
       FormData formData = FormData.fromMap(data);
       
       try {
-        
         var res = await api.postDio('/news', formData);
-        log((jsonEncode(res?.data)));
-        // log(res?.data);
         if(res?.data['status'] == true){
           var message = res?.data['message'];
-          log('Succcesss $message');
           if(!mounted) return;
           showDialog(context: context, builder: (BuildContext context){
             return AlertDialog(
@@ -80,7 +75,6 @@ class _AddBulletinState extends State<AddBulletin> {
                   }, child: Text('OK')
                 )
               ],
-
             );
           });
         } else {
@@ -90,8 +84,6 @@ class _AddBulletinState extends State<AddBulletin> {
         log(e.toString());
       }
     }
-
-
 
   Future<void> pickImage() async {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
