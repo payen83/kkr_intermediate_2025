@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kkr_intermediate_2025/app/view/bulletin.screen.dart';
-import 'package:kkr_intermediate_2025/app/view/login.screen.dart';
+// import 'package:kkr_intermediate_2025/app/view/bulletin.screen.dart';
+// import 'package:kkr_intermediate_2025/app/view/login.screen.dart';
+import 'package:kkr_intermediate_2025/app/view/map.screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const LoginScreen(),
+      home: const MapScreen(),
     );
   }
 }

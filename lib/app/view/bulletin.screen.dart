@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:kkr_intermediate_2025/app/service/api.service.dart';
 import 'package:kkr_intermediate_2025/app/view/addbulletin.screen.dart';
+import 'package:kkr_intermediate_2025/app/widget/drawer.widget.dart';
 
 class BulletinScreen extends StatefulWidget {
   const BulletinScreen({super.key});
@@ -47,6 +48,7 @@ class _BulletinScreenState extends State<BulletinScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('Bulletin KKR'),
       ),
+      drawer: DrawerWidget(),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: (){

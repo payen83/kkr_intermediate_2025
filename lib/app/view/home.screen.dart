@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kkr_intermediate_2025/app/controller/blog.controller.dart';
 import 'package:kkr_intermediate_2025/app/view/addblog.screen.dart';
+import 'package:kkr_intermediate_2025/app/widget/drawer.widget.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -20,6 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('State Management'),
       ),
+      drawer: DrawerWidget(),
       body: Obx(() => ListView.builder(
           itemCount: controller.blogList.length,
           itemBuilder: (context, index){
