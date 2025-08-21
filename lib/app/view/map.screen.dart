@@ -77,7 +77,9 @@ TickerProviderStateMixin {
         lat = position.latitude;
         lng = position.longitude;
         currentLatLng = LatLng(lat, lng);
+        centerMarker = currentLatLng;
         setMarker(currentLatLng);
+
       });
     } catch(e){
       log('Error in getting current location');
@@ -112,6 +114,35 @@ TickerProviderStateMixin {
                 userAgentPackageName: 'com.example.kkr_intermediate_2025',
               ),
               if(isMarkerCenter)...[
+                //Add marker info
+                Align(
+                  alignment: Alignment.center,
+                  child: Transform.translate(
+                      offset: Offset(0, -80),
+                      child: Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Lat: ${ centerMarker?.latitude.toStringAsFixed(5) }',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                'Lng: ${ centerMarker?.longitude.toStringAsFixed(5) }',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                ),
                 //Add Marker pin
                 Align(
                   alignment: Alignment.center,
