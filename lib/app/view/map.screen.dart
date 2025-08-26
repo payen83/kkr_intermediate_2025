@@ -128,8 +128,40 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         }
       }
     }
+  }
 
+  void onInputChanged(String value, MenuController menuController){
+    if(timer?.isActive ?? false) timer!.cancel();
+    timer = Timer(const Duration(milliseconds: 2000), (){
+      if(value.isNotEmpty){
+        menuController.open();
+        locationAutocomplete(value);
+      } else {
+        setState(() {
+          predictions = [];
+        });
+      }
+    });
+  }
 
+  void locationAutocomplete(String location) async{
+     Uri uri = Uri.https('maps.googleapis.com', 'maps/api/place/autocomplete/json', {
+      'input': location,
+      'key': apiKey,
+      'components': 'country:MY'
+    });
+
+    String? res = await api.fetchUri(uri);
+    if(res != null && res.isNotEmpty){
+      Map<String, dynamic> jsonResponse = json.decode(res);
+      if(jsonResponse['status'] == 'OK'){
+        setState(() {
+          predictions = jsonResponse['predictions'];
+        });
+      } else {
+        log('ERROR: ${jsonResponse['error_message']}');
+      }
+    }
   }
 
   @override
@@ -308,7 +340,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                             )
                           )
                         ),
-                        onChanged: (value) => {},
+                        onChanged: (value) {
+                          onInputChanged(value, menuController);
+                        },
                       ),
 
                     );
