@@ -109,20 +109,27 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           LatLng marker = LatLng(location['lat'], location['lng']);
           
           setState(() {
-            isMarkerCenter = false;
-            predictions = [];
-            markers.clear();
+            // isMarkerCenter = false;
+            // predictions = [];
+            // markers.clear();
+            // popupLayerController.hideAllPopups();
+            // markers.add(
+            //   Marker(point: marker, width: 40, height: 40, child: Icon(Icons.location_pin))
+            // );
+
             popupLayerController.hideAllPopups();
-            markers.add(
-              Marker(point: marker, width: 40, height: 40, child: Icon(Icons.location_pin))
-            );
+            markers.clear();
+            isMarkerCenter = false;
+            centerMarker = marker;
+            setMarker(marker);
           });
-          animatedMapController.animateTo(
-            dest: marker,
-            zoom: 13,
-            curve: Curves.easeOut,
-            duration: Duration(milliseconds: 1000)
-          );
+
+          // animatedMapController.animateTo(
+          //   dest: marker,
+          //   zoom: 13,
+          //   curve: Curves.easeOut,
+          //   duration: Duration(milliseconds: 1000)
+          // );
         } else {
           log("Error in getting location");
         }
@@ -330,7 +337,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           suffixIcon: IconButton(
                             onPressed: (){
-                              
+                              setState(() {
+                                searchController.text = '';
+                                predictions = [];
+                              });
                             },
                             icon: Icon(
                               Icons.close_rounded, 

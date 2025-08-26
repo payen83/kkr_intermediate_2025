@@ -55,6 +55,7 @@ class ApiServices {
   Future<dynamic> fetchUri(Uri uri) async{
     final dio = Dio();
     try{
+      // log('URI $uri');
       final res = await dio.getUri(
         uri,
         options: Options(
@@ -64,10 +65,13 @@ class ApiServices {
           }
         )
       );
+      log('RESPONSE ==> ${res.toString()}');
       if(res.statusCode == 200){
-        return json.decode(res.data);
+        // log('res.statusCode check');
+        return jsonEncode(res.data);
       }
     } catch(e){
+      log('ERROR getting response');
       log(e.toString());
     }
   }
