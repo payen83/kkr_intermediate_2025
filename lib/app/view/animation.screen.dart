@@ -14,6 +14,7 @@ class _AnimationScreenState extends State<AnimationScreen>
     with TickerProviderStateMixin {
   late AnimationController animationController;
   late Animation<double> animation;
+  late Animation<Offset> offsetAnimation;
 
   @override
   void initState() {
@@ -21,10 +22,18 @@ class _AnimationScreenState extends State<AnimationScreen>
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat();
+    )..repeat(reverse: true);
+
     animation = CurvedAnimation(
       parent: animationController,
       curve: Curves.linear,
+    );
+
+    offsetAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: Offset(3, 0)
+    ).animate(
+      CurvedAnimation(parent: animationController, curve: Curves.elasticIn)
     );
   }
 
@@ -39,21 +48,33 @@ class _AnimationScreenState extends State<AnimationScreen>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text('Map and Geolocation2'),
+        title: Text('Animation'),
       ),
       body: Center(
-        child: MatrixTransition(
-          animation: animation,
-          onTransform: (double value) {
-            return Matrix4.identity()
-              ..setEntry(3, 2, 0.004)
-              ..rotateY(pi * 2.0 * value);
-          },
-          child: Padding(
-            padding: EdgeInsets.all(8),
-            // child: FlutterLogo(size: 150),
-            child: Text('KKR', style: TextStyle(fontSize: 50),),
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            MatrixTransition(
+              animation: animation,
+              onTransform: (double value) {
+                return Matrix4.identity()
+                  ..setEntry(3, 2, 0.004)
+                  ..rotateY(pi * 2.0 * value);
+              },
+              child: Padding(
+                padding: EdgeInsets.all(8),
+                // child: FlutterLogo(size: 150),
+                child: Text('KKR', style: TextStyle(fontSize: 50),),
+              ),
+            ),
+            SlideTransition(position: offsetAnimation, 
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: FlutterLogo(size: 150,),
+            ),
+            )
+
+          ],
         ),
       ),
       drawer: DrawerWidget(),
