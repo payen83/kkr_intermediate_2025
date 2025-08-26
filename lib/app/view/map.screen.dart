@@ -1,11 +1,15 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:kkr_intermediate_2025/app/service/api.service.dart';
 import 'package:kkr_intermediate_2025/app/widget/drawer.widget.dart';
 import 'package:latlong2/latlong.dart';
+import 'dart:async';
+import 'package:kkr_intermediate_2025/app/service/key.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -25,6 +29,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   List<Marker> markers = [];
   LatLng? centerMarker;
   TextEditingController searchController = TextEditingController();
+  
+  List<dynamic> predictions = [];
+  Timer? timer;
 
   @override
   void initState() {
@@ -83,6 +90,46 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     } catch (e) {
       log('Error in getting current location');
     }
+  }
+
+  void locationDetails(String placeID) async {
+    Uri uri = Uri.https('maps.googleapis.com', 'maps/api/place/details/json', {
+      'place_id': placeID,
+      'key': apiKey,
+      'fields': 'geometry',
+      'components': 'country:MY'
+    });
+
+    var res = await api.fetchUri(uri);
+    if(res != null && res.isNotEmpty){
+      var jsonResponse = json.decode(res);
+      if(jsonResponse['status']=='OK'){
+        var location = jsonResponse?['result']?['geometry']?['location'];
+        if(location['lat'] != null && location['lng'] != null){
+          LatLng marker = LatLng(location['lat'], location['lng']);
+          
+          setState(() {
+            isMarkerCenter = false;
+            predictions = [];
+            markers.clear();
+            popupLayerController.hideAllPopups();
+            markers.add(
+              Marker(point: marker, width: 40, height: 40, child: Icon(Icons.location_pin))
+            );
+          });
+          animatedMapController.animateTo(
+            dest: marker,
+            zoom: 13,
+            curve: Curves.easeOut,
+            duration: Duration(milliseconds: 1000)
+          );
+        } else {
+          log("Error in getting location");
+        }
+      }
+    }
+
+
   }
 
   @override
@@ -182,7 +229,62 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  menuChildren: [],
+                  menuChildren: [
+                    ...predictions.asMap().entries.map((entry){
+                      int index = entry.key;
+                      var prediction = entry.value;
+                      return Column(
+                        children: [
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width-32,
+                            child: MenuItemButton(
+                              onPressed: (){
+                                setState(() {
+                                  searchController.text = prediction['description'];
+                                  searchController.selection = TextSelection.fromPosition(const TextPosition(offset: 0));
+                                });
+                                locationDetails(prediction['place_id']);
+                              },
+                              child: Row(
+                                children: [
+                                  Icon(Icons.pin_drop,color: Colors.blue, size: 20),
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(8, 8, 0, 8),
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width-92,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            prediction['description'].split(',')[0],
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                          ),
+                                          Text(
+                                            prediction['description'],
+                                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            
+                          ),
+                          if(index != predictions.length)
+                          const Divider(
+                            height: 0,
+                            thickness: 1,
+                            indent: 16,
+                            endIndent: 16,
+                            color: Colors.grey,
+                          )
+                        ],
+                      );
+                    }),
+                    
+                  ],
                   builder: (_, MenuController menuController, Widget? child){
                     return Card(
                       margin: EdgeInsets.only(top: 10),
@@ -195,7 +297,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           suffixIcon: IconButton(
-                            onPressed: (){},
+                            onPressed: (){
+                              
+                            },
                             icon: Icon(
                               Icons.close_rounded, 
                               color: searchController.text.isNotEmpty 

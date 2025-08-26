@@ -1,4 +1,5 @@
 // import 'dart:convert';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:kkr_intermediate_2025/app/service/sharedpreference.service.dart';
@@ -48,6 +49,26 @@ class ApiServices {
     } catch (e) {
       log(e.toString());
       return null;
+    }
+  }
+
+  Future<dynamic> fetchUri(Uri uri) async{
+    final dio = Dio();
+    try{
+      final res = await dio.getUri(
+        uri,
+        options: Options(
+          followRedirects: false,
+          validateStatus: (status){
+            return status != null && status < 500;
+          }
+        )
+      );
+      if(res.statusCode == 200){
+        return json.decode(res.data);
+      }
+    } catch(e){
+      log(e.toString());
     }
   }
 }
