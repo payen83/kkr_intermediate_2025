@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kkr_intermediate_2025/app/view/animation.screen.dart';
 import 'package:kkr_intermediate_2025/app/view/bulletin.screen.dart';
 import 'package:kkr_intermediate_2025/app/view/home.screen.dart';
 import 'package:kkr_intermediate_2025/app/view/map.screen.dart';
@@ -40,6 +41,11 @@ class DrawerWidget extends StatelessWidget {
                   itemTitle: 'Bulletin', 
                   itemIcon: Icons.newspaper, 
                   widgetScreen: BulletinScreen(),
+                ),
+                MenuItem(
+                  itemTitle: 'Animation', 
+                  itemIcon: Icons.flutter_dash, 
+                  widgetScreen: AnimationScreen(),
                 )
               ],
             )
