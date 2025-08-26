@@ -1,6 +1,6 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:kkr_intermediate_2025/app/widget/appbar.widget.dart';
 import 'package:kkr_intermediate_2025/app/widget/drawer.widget.dart';
 
 class AnimationScreen extends StatefulWidget {
@@ -29,12 +29,10 @@ class _AnimationScreenState extends State<AnimationScreen>
       curve: Curves.linear,
     );
 
-    offsetAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: Offset(3, 0)
-    ).animate(
-      CurvedAnimation(parent: animationController, curve: Curves.elasticIn)
-    );
+    offsetAnimation = Tween<Offset>(begin: Offset.zero, end: Offset(3, 0))
+        .animate(
+          CurvedAnimation(parent: animationController, curve: Curves.elasticIn),
+        );
   }
 
   @override
@@ -46,10 +44,7 @@ class _AnimationScreenState extends State<AnimationScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text('Animation'),
-      ),
+      appBar: AppBarWidget(title: 'Animation'),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -64,16 +59,16 @@ class _AnimationScreenState extends State<AnimationScreen>
               child: Padding(
                 padding: EdgeInsets.all(8),
                 // child: FlutterLogo(size: 150),
-                child: Text('KKR', style: TextStyle(fontSize: 50),),
+                child: Text('KKR', style: TextStyle(fontSize: 50)),
               ),
             ),
-            SlideTransition(position: offsetAnimation, 
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: FlutterLogo(size: 150,),
+            SlideTransition(
+              position: offsetAnimation,
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: FlutterLogo(size: 150),
+              ),
             ),
-            )
-
           ],
         ),
       ),
