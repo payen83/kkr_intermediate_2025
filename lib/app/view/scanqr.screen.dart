@@ -28,7 +28,7 @@ class _ScanQrScreenState extends State<ScanQrScreen> {
         onDetect: (capture) async {
           final List<Barcode> barcodes = capture.barcodes;
           String qrcode = '';
-          if(barcodes.isEmpty && barcodes.first.rawValue != null){
+          if(barcodes.isNotEmpty && barcodes.first.rawValue != null){
             await Future.delayed(Duration(seconds: 1));
             qrcode = barcodes.first.rawValue.toString();
           } else {
