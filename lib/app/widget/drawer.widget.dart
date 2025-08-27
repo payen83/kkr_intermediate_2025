@@ -4,6 +4,7 @@ import 'package:kkr_intermediate_2025/app/view/bulletin.screen.dart';
 import 'package:kkr_intermediate_2025/app/view/heroanimation.screen.dart';
 import 'package:kkr_intermediate_2025/app/view/home.screen.dart';
 import 'package:kkr_intermediate_2025/app/view/map.screen.dart';
+import 'package:kkr_intermediate_2025/app/view/qrcontact.screen.dart';
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
@@ -52,6 +53,11 @@ class DrawerWidget extends StatelessWidget {
                   itemTitle: 'Hero Animation', 
                   itemIcon: Icons.face_3, 
                   widgetScreen: HeroAnimationScreen(),
+                ),
+                MenuItem(
+                  itemTitle: 'QR and Contacts', 
+                  itemIcon: Icons.qr_code, 
+                  widgetScreen: QRContactScreen(),
                 )
               ],
             )
