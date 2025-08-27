@@ -5,8 +5,9 @@ import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart
 import 'package:flutter_native_contact_picker/model/contact.dart';
 import 'package:kkr_intermediate_2025/app/styles/styles.dart';
 import 'package:kkr_intermediate_2025/app/view/scanqr.screen.dart';
-import 'package:kkr_intermediate_2025/app/widget/appbar.widget.dart';
+// import 'package:kkr_intermediate_2025/app/widget/appbar.widget.dart';
 import 'package:kkr_intermediate_2025/app/widget/drawer.widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class QRContactScreen extends StatefulWidget {
   const QRContactScreen({super.key});
@@ -36,10 +37,26 @@ class _QRContactScreenState extends State<QRContactScreen> {
     }
   }
 
+  Future<void> _launchUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+
+    if (!await launchUrl(uri)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarWidget(title: 'QR and Contact List'),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text('QR & Contacts'),
+        actions: [
+          IconButton(onPressed: (){
+            _launchUrl('https://www.kkr.gov.my/ms');
+          }, icon: Icon(Icons.wordpress_outlined))
+        ],
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -56,9 +73,14 @@ class _QRContactScreenState extends State<QRContactScreen> {
                     )
                   ).then((response){
                     if(response != null){
-                      setState(() {
-                        qrText = response;
-                      });
+
+                      if(response.split(':')[0] == 'https' || response.split(':')[0] == 'http'){
+                        _launchUrl(response);
+                      } else {
+                        setState(() {
+                          qrText = response;
+                        });
+                      }
                     }
                   });
                 }, 

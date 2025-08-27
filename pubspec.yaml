@@ -45,6 +45,7 @@ dependencies:
   flutter_map_animations: ^0.9.0
   mobile_scanner: ^7.0.1
   flutter_native_contact_picker: ^0.0.10
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
